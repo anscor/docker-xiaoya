@@ -15,4 +15,3 @@ if [ -z "$service" ]; then
 else
     docker build -t "monlor/xiaoya-$service" "$service"
 fi
-

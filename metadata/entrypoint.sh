@@ -41,7 +41,7 @@ disk_check() {
         echo "目录${dir}最少需要剩余空间：${size}G，目前仅剩：${free_size_G}G"
         exit 1
     fi
-}  
+}
 
 download_meta() {
     file=$1
@@ -96,7 +96,7 @@ download_emby_config() {
     fi
 
     disk_check ${MEDIA_DIR}/temp 5
-    disk_check ${MEDIA_DIR}/config 5 
+    disk_check ${MEDIA_DIR}/config 5
 
     echo "Downloading Emby config..."
 
@@ -116,7 +116,7 @@ download_emby_config() {
     fi
 }
 
-download_emby_media() {    
+download_emby_media() {
     if [ -f "${MEDIA_DIR}/xiaoya/emby_media_finished" ]; then
         echo "Emby media has been downloaded. Delete the file ${MEDIA_DIR}/xiaoya/emby_media_finished to re-extract."
         return
@@ -127,12 +127,13 @@ download_emby_media() {
 
     disk_check ${MEDIA_DIR}/temp 60
     disk_check ${MEDIA_DIR}/xiaoya 70
-    
+
     echo "Downloading Emby media..."
 
     cd "${MEDIA_DIR}/temp"
     download_meta all.mp4
     download_meta pikpak.mp4
+    download_meta 115.mp4
 
     echo "Extracting Emby media..."
 
@@ -142,14 +143,18 @@ download_emby_media() {
     cd ${MEDIA_DIR}/xiaoya
     7z x -aoa -mmt=16 ${MEDIA_DIR}/temp/pikpak.mp4
 
+    cd ${MEDIA_DIR}/xiaoya
+    7z x -aoa -mmt=16 ${MEDIA_DIR}/temp/115.mp4
+
     chmod -R 777 ${MEDIA_DIR}/xiaoya
 
     touch ${MEDIA_DIR}/xiaoya/emby_media_finished
 
-    #删除临时文件all.mp4,pikpak.mo4
+    #删除临时文件all.mp4,pikpak.mp4
     if [ "${CLEAR_TEMP:=false}" = "true" ]; then
         rm -f $MEDIA_DIR/temp/all.mp4
         rm -f $MEDIA_DIR/temp/pikpak.mp4
+        rm -f $MEDIA_DIR/temp/115.mp4
     fi
 }
 
@@ -166,7 +171,7 @@ download_jellyfin_config() {
 
     cd ${MEDIA_DIR}/temp
     download_meta config_jf.mp4 Jellyfin/
-    
+
     echo "Extracting Jellyfin config..."
 
     cd ${MEDIA_DIR}
@@ -180,7 +185,7 @@ download_jellyfin_config() {
     fi
 }
 
-download_jellyfin_media() {    
+download_jellyfin_media() {
     if [ -f "${MEDIA_DIR}/jf_xiaoya/jellyfin_media_finished" ]; then
         echo "Jellyfin media has been downloaded. Delete the file ${MEDIA_DIR}/jf_xiaoya/jellyfin_media_finished to re-extract."
         return
@@ -191,7 +196,7 @@ download_jellyfin_media() {
 
     disk_check ${MEDIA_DIR}/temp 60
     disk_check ${MEDIA_DIR}/jf_xiaoya 70
-    
+
     echo "Downloading Jellyfin media..."
 
     cd "${MEDIA_DIR}/temp"
@@ -250,6 +255,6 @@ if [ -n "${crontabs}" ]; then
     echo -e "$crontabs" | crontab -
 fi
 
-echo "Complete." 
+echo "Complete."
 
 cron -f
